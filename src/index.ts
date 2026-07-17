@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+import { createRequire } from "node:module";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { registerAskCodebase } from "./ask-codebase.ts";
@@ -12,7 +13,9 @@ import {
 } from "./config.ts";
 import { log } from "./logger.ts";
 
-const server = new McpServer({ name: "opencode-mcp", version: "1.0.0" });
+const { version } = createRequire(import.meta.url)("../package.json") as { version: string };
+
+const server = new McpServer({ name: "opencode-mcp", version });
 registerAskCodebase(server);
 
 log.info(

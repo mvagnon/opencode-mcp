@@ -5,10 +5,13 @@ MCP stdio server (TypeScript, ESM) exposing one tool, `ask_codebase`: read-only 
 ## Commands
 
 ```bash
+npm run lint        # eslint (flat config, eslint.config.mjs)
 npm run typecheck   # tsc --noEmit — run after every change
 npm run build       # emit dist/ (the shipped artifact)
 npm test            # node:test on src/*.test.ts (runs .ts natively, no build)
 ```
+
+CI (`.github/workflows/ci.yml`) runs exactly these four on every push/PR — all must pass.
 
 ## Architecture
 
@@ -45,6 +48,13 @@ Call flow: `ask_codebase` → `ensureRepo` (fetch lock → manifest → `getRepo
 - No comments except `// tradeoff:`, `// debt:`, and TSDoc on shared/exported elements.
 - Files stay well under 500 lines; split by responsibility instead of growing a module.
 - Env var names (`OPENCODE_*`, `ASK_CODEBASE_TIMEOUT`) are public contract — renaming breaks deployments; document any addition in README.md.
+
+## Releases & commits
+
+- **Conventional Commits are mandatory** (`feat:`, `fix:`, `docs:`, `chore:`, `feat!:`…): release-please derives versions and `CHANGELOG.md` from them.
+- **Never bump versions by hand.** release-please owns `package.json` `version`, `.release-please-manifest.json`, and `CHANGELOG.md`. The server reads its version from `package.json` at runtime (`createRequire` in `index.ts`) — no version string lives in source.
+- Publishing to npm happens only in `.github/workflows/release.yml` via OIDC trusted publishing after the release PR is merged; there is no npm token to manage.
+- The published artifact is `dist/` only (`files` in `package.json`); `prepack` rebuilds it on publish.
 
 ## Testing rules
 

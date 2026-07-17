@@ -55,12 +55,24 @@ The hard timeout defaults to 10 minutes and an MCP progress notification is emit
 
 ## Install
 
+From npm:
+
 ```bash
-npm install
-npm run build
+npm install -g @mvagnon/opencode-mcp   # installs the `opencode-mcp` command
 ```
 
-The server binary is `dist/index.js` (stdio transport).
+Or run it without installing:
+
+```bash
+npx -y @mvagnon/opencode-mcp
+```
+
+From source:
+
+```bash
+npm install
+npm run build   # server binary: dist/index.js (stdio transport)
+```
 
 ## Configuration
 
@@ -80,13 +92,15 @@ Example client entry (Hermes):
 ```yaml
 mcp_servers:
   opencode:
-    command: node
-    args: ["/abs/path/to/opencode-mcp/dist/index.js"]
+    command: npx
+    args: ["-y", "@mvagnon/opencode-mcp"]
     timeout: 660 # keep above ASK_CODEBASE_TIMEOUT
     env:
       OPENCODE_BIN: /usr/local/bin/opencode
       OPENCODE_AGENT: explore
 ```
+
+For a from-source checkout, use `command: node` with `args: ["/abs/path/to/opencode-mcp/dist/index.js"]` instead.
 
 ## The `ask_codebase` tool
 
@@ -102,6 +116,7 @@ Use it for architecture questions, where a feature lives, request flow, conventi
 ## Development
 
 ```bash
+npm run lint        # eslint
 npm run typecheck   # tsc --noEmit
 npm run build       # emit dist/
 npm test            # node:test unit tests (pure logic)
@@ -109,3 +124,16 @@ npm run dev         # tsc --watch
 ```
 
 Source layout: see [AGENTS.md](AGENTS.md).
+
+## Releasing
+
+Releases are fully automated with [release-please](https://github.com/googleapis/release-please) and npm [trusted publishing](https://docs.npmjs.com/trusted-publishers/) (OIDC — no npm token stored in the repo):
+
+1. Land changes on `main` using [Conventional Commits](https://www.conventionalcommits.org) (`feat:`, `fix:`, `feat!:`…) — they drive the version bump and the changelog.
+2. release-please maintains a release PR that accumulates changes, bumps `package.json`, and updates `CHANGELOG.md`.
+3. Merging the release PR creates the GitHub release and tag; the `publish` job then publishes to npm via OIDC.
+
+One-time setup (already done once the package exists):
+
+- npm cannot create a package via OIDC, so the **first version must be published manually** (`npm login && npm publish`).
+- Then on npmjs.com → package → Settings → **Trusted Publisher**: GitHub Actions, repository `mvagnon/opencode-mcp`, workflow `release.yml`.
