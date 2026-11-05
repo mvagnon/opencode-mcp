@@ -1,3 +1,8 @@
+> [!CAUTION]
+> **DEPRECATED**
+>
+> This project is deprecated and no longer maintained.
+
 # opencode-mcp
 
 MCP server (stdio) exposing an `ask_codebase` tool: ask a natural-language question about a GitHub repository, get an answer grounded in the real code. **READ-ONLY by design.**
